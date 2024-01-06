@@ -2,6 +2,7 @@
 
 A tiny Javascript library that gives live as-you-type formatting to numbers & currencies, ~1600 bytes minified + gzipped.
 
+[View demo](https://abhinavxd.github.io/liveNumberFormat.js/)
 
 ![output](https://github.com/abhinavxd/liveNumberFormat.js/assets/48166553/161e1ffc-a25a-468f-908d-a5991bad40cf)
 
