@@ -1,0 +1,27 @@
+{
+  "name": "live-number-format",
+  "version": "0.1.0",
+  "description": "A tiny Javascript library that gives live as-you-type formatting to numbers & currencies, ~1600 bytes minified + gzipped.",
+  "main": "livenumberformat.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhinavxd/liveNumberFormat.js.git"
+  },
+  "keywords": [
+    "numberformatter",
+    "currency",
+    "formatter"
+  ],
+  "author": "Abhinav Raut",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/abhinavxd/liveNumberFormat.js/issues"
+  },
+  "homepage": "https://github.com/abhinavxd/liveNumberFormat.js#readme"
+}
