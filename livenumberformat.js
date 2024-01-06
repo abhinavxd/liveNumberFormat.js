@@ -352,7 +352,10 @@ export default class LiveNumberFormat {
     }
 
     getFloatValue () {
-        const value = this.getRawValue().match(/(\d+(\.\d+)?)/g).join('');
+        let value = this.getRawValue();
+        if (value) {
+            value = value.match(/(\d+(\.\d+)?)/g).join('');
+        }
         return isNaN(parseFloat(value)) === true ? 0 : parseFloat(value);
     }
 
