@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>liveNumberFormat.js</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * {
+        box-sizing: border-box;
+        -webkit-appearance: none;
+      }
+      html,
+      body {
+        font-family: "Inter", "Helvetica Neue", "Museo Sans", sans-serif;
+        font-size: 25px;
+        line-height: 30px;
+        color: #555555;
+      }
+      #numberInput {
+        font-family: "Inter", "Helvetica Neue", "Museo Sans", sans-serif;
+        padding: 15px;
+        font-size: 2rem;
+        line-height: 1.5rem;
+        border: 1px solid #ccc;
+        box-shadow: 2px 2px 0px #ccc;
+        width: 90%;
+        height: 100px;
+      }
+
+      .eg {
+        font-size: 0.8rem;
+      }
+
+      .note {
+        font-size: 0.8rem;
+        color: #999;
+      }
+
+      a {
+        color: #999;
+      }
+
+      h1 {
+        color: #0054c6;
+      }
+
+      .text-center {
+        text-align: center !important;
+      }
+
+      .container {
+        margin: 20vh auto 0 auto;
+        max-width: 1000px;
+      }
+
+      input,
+      select,
+      #format {
+        outline: none;
+        padding: 8px;
+        border: 1px solid #ccc;
+        box-shadow: 2px 2px 0px #ccc;
+        background-color: white;
+        outline: none;
+      }
+
+      .mt-20 {
+        margin-top: 20px;
+      }
+
+      @media screen and (max-width: 900px) {
+        body {
+          font-size: 18px;
+          line-height: 22px;
+        }
+        .container {
+          margin-top: 5vh;
+        }
+        #numberInput {
+          font-size: 1.2rem;
+          padding: 10px;
+          line-height: 1.3rem;
+          width: 90%;
+          height: 90px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>liveNumberFormat.js</h1>
+      <p>
+        A tiny Javascript library that gives live as-you-type formatting to
+        numbers & currencies, ~1500 bytes minified + gzipped.
+      </p>
+      <input
+        autofocus
+        type="text"
+        id="numberInput"
+        placeholder="Enter a number"
+      />
+
+      <select name="format" id="format" class="mt-20">
+        <option value="thousand" selected>Thousand (Western)</option>
+        <option value="thousandLakhCrore">
+          Thousand, lakh, crore (Indian)
+        </option>
+        <option value="tenThousand">Ten thousand (East Asian)</option>
+      </select>
+
+      <br />
+      <p class="eg">Raw: <span id="raw"></span></p>
+
+      <p class="eg">Float: <span id="flt">0</span></p>
+
+      <br />
+      <br />
+      <br />
+
+      <p class="note">
+        For features & configurations, see:
+        <a href="https://github.com/abhinavxd/liveNumberFormat.js"
+          >abhinavxd/liveNumberFormat.js</a
+        >
+      </p>
+    </div>
+
+    <script type="module">
+      import LiveNumberFormat from "./livenumberformat.min.js";
+
+      let input = document.querySelector("input");
+
+      // Set up the formatter
+      let formatter = new LiveNumberFormat(input, {
+        formatStyle: document.getElementById("format").value,
+        stripLeadingZeroes: false,
+        debounceTime: 200,
+        integerScale: 20,
+        decimalScale: 7,
+        allowDecimalReplacement: false,
+      });
+
+      // Set the format style
+      document
+        .getElementById("format")
+        .addEventListener("change", function (e) {
+          formatter = new LiveNumberFormat(input, {
+            stripLeadingZeroes: false,
+            formatStyle: e.target.value,
+            allowNegative: true,
+            debounceTime: 200,
+            integerScale: 20,
+            decimalScale: 7,
+            allowDecimalReplacement: false,
+          });
+          input.value = "";
+          input.focus();
+        });
+
+      document
+        .getElementById("numberInput")
+        .addEventListener("input", function (e) {
+          document.getElementById("raw").innerText = formatter.getRawValue();
+          document.getElementById("flt").innerText = formatter.getFloatValue();
+        });
+    </script>
+  </body>
+</html>
