@@ -91,7 +91,7 @@
       <h1>liveNumberFormat.js</h1>
       <p>
         A tiny Javascript library that gives live as-you-type formatting to
-        numbers & currencies, ~1500 bytes minified + gzipped.
+        numbers & currencies, ~1600 bytes minified + gzipped.
       </p>
       <input
         autofocus
@@ -134,6 +134,7 @@
       let formatter = new LiveNumberFormat(input, {
         formatStyle: document.getElementById("format").value,
         stripLeadingZeroes: false,
+        allowNegative: true,
         debounceTime: 200,
         integerScale: 20,
         decimalScale: 7,
@@ -145,8 +146,8 @@
         .getElementById("format")
         .addEventListener("change", function (e) {
           formatter = new LiveNumberFormat(input, {
-            stripLeadingZeroes: false,
             formatStyle: e.target.value,
+            stripLeadingZeroes: false,
             allowNegative: true,
             debounceTime: 200,
             integerScale: 20,
