@@ -14,7 +14,7 @@ export default class LiveNumberFormat {
 
         this.decimalMark = options.decimalMark !== undefined ? options.decimalMark : ".";
 
-        this.formatStyle = options.formatStyle !== undefined ? options.formatStyle : "thousandSeparator";
+        this.formatStyle = options.formatStyle !== undefined ? options.formatStyle : "thousand";
 
         this.delimiter = options.delimiter !== undefined ? options.delimiter : ",";
 
