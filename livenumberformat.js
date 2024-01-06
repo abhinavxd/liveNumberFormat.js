@@ -354,7 +354,9 @@ export default class LiveNumberFormat {
     getFloatValue () {
         let value = this.getRawValue();
         if (value) {
-            value = value.match(/(\d+(\.\d+)?)/g).join('');
+            console.log(value);
+            value = value.match(/[0-9.-]+/g).join('');
+            console.log(value);
         }
         return isNaN(parseFloat(value)) === true ? 0 : parseFloat(value);
     }
