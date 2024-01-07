@@ -32,6 +32,8 @@ export default class LiveNumberFormat {
         this.handleInput = this.handleInput.bind(this);
         this.handleKeydown = this.handleKeydown.bind(this);
 
+        this.backspacePressed = false;
+
         this.init();
 
         if (this.input.value) {
@@ -213,8 +215,8 @@ export default class LiveNumberFormat {
             return -1;
         }
 
-        // delimeter position changed, move cursor to its correct position
-        if (oldFormattedValueAfterCursor != newFormattedValueAfterCursor) {
+        // delimeter position changed due to backspace, move cursor to its correct position
+        if (oldFormattedValueAfterCursor != newFormattedValueAfterCursor && this.backspacePressed) {
             if (oldFormattedValueAfterCursor.startsWith(delimiter)) {
                 return -1;
             }
@@ -225,7 +227,10 @@ export default class LiveNumberFormat {
     }
 
     handleKeydown (e) {
-        if (e.key === "ArrowLeft" && !e.shiftKey) {
+        this.backspacePressed = false;
+        if (e.key === "Backspace") {
+            this.backspacePressed = true;
+        } else if (e.key === "ArrowLeft" && !e.shiftKey) {
             this.handleLeftArrow(e);
             return;
         } else if (e.key === "ArrowRight" && !e.shiftKey) {
@@ -345,7 +350,7 @@ export default class LiveNumberFormat {
         }
     }
 
-    destroy () {        
+    destroy () {
         this.input.removeEventListener("input", this.handleInput);
         this.input.removeEventListener("keydown", this.handleKeydown);
     }
