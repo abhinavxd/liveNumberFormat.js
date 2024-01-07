@@ -29,9 +29,6 @@ export default class LiveNumberFormat {
 
         this.maxUndoStackSize = options.maxUndoStackSize || 500;
 
-        // To detect if delete key was pressed in the input event
-        this.deletePressed = false;
-
         this.init();
 
         if (this.input.value) {
@@ -203,10 +200,6 @@ export default class LiveNumberFormat {
         oldRawValue = oldValue.slice(0, prevPos).replace(delimiterRegex, '');
         newRawValue = newValue.slice(0, prevPos).replace(delimiterRegex, '');
 
-        // Delete key pressed before a delimiter, Move cursor 1 place to right
-        if (this.deletePressed && newFormattedValueAfterCursor.startsWith(delimiter)) {
-            return 1;
-        }
 
         // some edge cases where cursor position needs to be adjusted
         if (newRawValue.startsWith('-') && (oldRawValue.match(/[^0-9\.]/g))) {
@@ -229,8 +222,6 @@ export default class LiveNumberFormat {
     }
 
     handleKeydown (e) {
-        this.deletePressed = false;
-
         if (e.key === "ArrowLeft" && !e.shiftKey) {
             this.handleLeftArrow(e);
             return;
@@ -244,7 +235,11 @@ export default class LiveNumberFormat {
             this.performRedo(e);
             return;
         } else if (e.key === "Delete") {
-            this.deletePressed = true;
+            // skip if cursor is before a delimiter and delete is pressed
+            if (this.input.value[this.input.selectionStart] === this.delimiter) {
+                e.preventDefault();
+                this.setCursorPosition(this.input.selectionStart + 1);
+            }
             return;
         }
 
