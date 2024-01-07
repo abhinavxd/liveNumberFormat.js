@@ -1,6 +1,6 @@
 {
   "name": "live-number-format",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A tiny Javascript library that gives live as-you-type formatting to numbers & currencies, ~1600 bytes minified + gzipped.",
   "main": "livenumberformat.js",
   "directories": {
