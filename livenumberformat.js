@@ -207,6 +207,10 @@ export default class LiveNumberFormat {
 
         // some edge cases where cursor position needs to be adjusted
         if (newRawValue.startsWith('-') && (oldRawValue.match(/[^0-9\.]/g))) {
+            // delete key pressed, after a negative sign
+            if (oldRawValue == newRawValue) {
+                return 0;
+            }
             return -1;
         } else if (oldRawValue.match(/[^0-9\.]/g)) {
             return -1;
