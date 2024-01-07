@@ -29,6 +29,9 @@ export default class LiveNumberFormat {
 
         this.maxUndoStackSize = options.maxUndoStackSize || 500;
 
+        this.handleInput = this.handleInput.bind(this);
+        this.handleKeydown = this.handleKeydown.bind(this);
+
         this.init();
 
         if (this.input.value) {
@@ -39,8 +42,8 @@ export default class LiveNumberFormat {
     }
 
     init () {
-        this.input.addEventListener("input", this.handleInput.bind(this));
-        this.input.addEventListener("keydown", this.handleKeydown.bind(this));
+        this.input.addEventListener("input", this.handleInput);
+        this.input.addEventListener("keydown", this.handleKeydown);
     }
 
     format (value) {
@@ -235,8 +238,8 @@ export default class LiveNumberFormat {
             this.performRedo(e);
             return;
         } else if (e.key === "Delete") {
-            // skip if cursor is before a delimiter and delete is pressed
-            if (this.input.value[this.input.selectionStart] === this.delimiter) {
+            // if cursor is before delimiter and is NOT at index 0, move cursor 1 place right
+            if (this.input.value[this.input.selectionStart] === this.delimiter && this.input.selectionStart != 0) {
                 e.preventDefault();
                 this.setCursorPosition(this.input.selectionStart + 1);
             }
@@ -340,6 +343,11 @@ export default class LiveNumberFormat {
             this.setCursorPosition(itemToRedo.cpos);
 
         }
+    }
+
+    destroy () {        
+        this.input.removeEventListener("input", this.handleInput);
+        this.input.removeEventListener("keydown", this.handleKeydown);
     }
 
     getRawValue () {

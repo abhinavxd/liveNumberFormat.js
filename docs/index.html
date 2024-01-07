@@ -145,6 +145,7 @@
       document
         .getElementById("format")
         .addEventListener("change", function (e) {
+          formatter.destroy();
           formatter = new LiveNumberFormat(input, {
             formatStyle: e.target.value,
             stripLeadingZeroes: false,
