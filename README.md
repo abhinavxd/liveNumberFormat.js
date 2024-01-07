@@ -4,8 +4,7 @@ A tiny Javascript library that gives live as-you-type formatting to numbers & cu
 
 [View demo](https://abhinavxd.github.io/liveNumberFormat.js/)
 
-![output](https://github.com/abhinavxd/liveNumberFormat.js/assets/48166553/8a00d7b2-64e2-4557-80d8-6dc214c3ff24)
-
+![output](https://github.com/abhinavxd/liveNumberFormat.js/assets/48166553/a3365b1c-025a-4ac7-a9f3-3e9dddcf3270)
 
 
 Check the [demo source](https://github.com/abhinavxd/liveNumberFormat.js/blob/main/docs/index.html).
