@@ -19,6 +19,7 @@ npm i live-number-format
 Default values for config shown below.
 
 ```javascript
+let input = document.querySelector("input");
 new LiveNumberFormat(input,
 {
         // Options for formatStyle
