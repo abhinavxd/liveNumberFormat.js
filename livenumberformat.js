@@ -142,7 +142,6 @@ export default class LiveNumberFormat {
             cursorPosition,
             oldVal,
             newVal,
-            this.delimiter,
         );
 
         this.input.value = newVal;
@@ -155,12 +154,12 @@ export default class LiveNumberFormat {
         this.input.setSelectionRange(pos, pos);
     }
 
-    getNextCursorPosition (prevPos, oldValue, newValue, delimiter) {
+    getNextCursorPosition (prevPos, oldValue, newValue) {
         // cursor already at the end, set it to the end of new value
         if (oldValue.length === prevPos) {
             return newValue.length;
         }
-        return prevPos + this.getPositionOffset(prevPos, oldValue, newValue, delimiter);
+        return prevPos + this.getPositionOffset(prevPos, oldValue, newValue);
     }
 
     getDelimiterRegex () {
@@ -195,8 +194,8 @@ export default class LiveNumberFormat {
         };
     }
 
-    getPositionOffset (prevPos, oldValue, newValue, delimiter) {
-        let delimiterRegex = new RegExp(delimiter, 'g');
+    getPositionOffset (prevPos, oldValue, newValue) {
+        let delimiterRegex = new RegExp(this.delimiter, 'g');
 
         let oldRawValue, newRawValue, newFormattedValueAfterCursor, oldFormattedValueAfterCursor;
 
@@ -217,7 +216,7 @@ export default class LiveNumberFormat {
 
         // delimeter position changed due to backspace, move cursor to its correct position
         if (oldFormattedValueAfterCursor != newFormattedValueAfterCursor && this.backspacePressed) {
-            if (oldFormattedValueAfterCursor.startsWith(delimiter)) {
+            if (oldFormattedValueAfterCursor.startsWith(this.delimiter)) {
                 return -1;
             }
         }

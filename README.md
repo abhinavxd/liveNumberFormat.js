@@ -11,9 +11,12 @@ A tiny Javascript library that gives live as-you-type formatting to numbers & cu
 Check the [demo source](https://github.com/abhinavxd/liveNumberFormat.js/blob/main/docs/index.html).
 
 
-## Optional config
+## Usage
+```
+npm i live-number-format
+```
 
-Default values shown below.
+Default values for config shown below.
 
 ```javascript
 new LiveNumberFormat(input,
