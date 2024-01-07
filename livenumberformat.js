@@ -195,26 +195,37 @@ export default class LiveNumberFormat {
     }
 
     getPositionOffset (prevPos, oldValue, newValue) {
-        let delimiterRegex = new RegExp(this.delimiter, 'g');
+        // Edge case for negative values,
+        // e.g -2|,321,321 and user presses backspace.
+        if (oldValue.startsWith("-" + this.delimiter) && newValue.startsWith("-")) {
+            return 0;
+        }
 
         let oldRawValue, newRawValue, newFormattedValueAfterCursor, oldFormattedValueAfterCursor;
 
         oldFormattedValueAfterCursor = oldValue.slice(prevPos);
         newFormattedValueAfterCursor = newValue.slice(prevPos);
-        oldRawValue = oldValue.slice(0, prevPos).replace(delimiterRegex, '');
-        newRawValue = newValue.slice(0, prevPos).replace(delimiterRegex, '');
 
+        oldRawValue = oldValue.slice(0, prevPos).replace(this.getDelimiterRegex(), '');
+        newRawValue = newValue.slice(0, prevPos).replace(this.getDelimiterRegex(), '');
 
-        // some edge cases where cursor position needs to be adjusted
-        if (newRawValue.startsWith('-') && (oldRawValue.match(/[^0-9\.]/g))) {
-            // delete key pressed, after a negative sign
-            if (oldRawValue == newRawValue) {
-                return 0;
-            }
+        // Replace all negatives. This is done to check if the user is adding a negative sign.
+        oldRawValue = oldRawValue.replace('-', '');
+        newRawValue = newRawValue.replace('-', '');
+
+        // Minus sign being added, since it was replaced in oldRawValue
+        // keep cursor at the same position
+        if (oldRawValue.includes("-")) {
             return -1;
-        } else if (oldRawValue.match(/[^0-9\.]/g)) {
+        }
+        
+        // Invalid characters entered, keep cursor at the same position
+        if (oldRawValue.match(/[^0-9\.-]/)) {
             return -1;
-        } else if (this.stripLeadingZeroes && oldRawValue === '0') {
+        }
+        
+        // keep cursor at the same position
+        if (this.stripLeadingZeroes && oldRawValue === '0') {
             return -1;
         }
 
