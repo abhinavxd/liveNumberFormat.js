@@ -1,6 +1,6 @@
 export default class LiveNumberFormat {
     constructor(el, options = {}) {
-        this.input = el;
+        this.el = el;
 
         this.undoStack = []; // Stack to maintain history for undo
         this.redoStack = []; // Stack for redo
@@ -12,11 +12,11 @@ export default class LiveNumberFormat {
 
         this.allowNegative = options.allowNegative !== undefined ? options.allowNegative : true;
 
-        this.decimalMark = options.decimalMark !== undefined ? options.decimalMark : ".";
-
         this.formatStyle = options.formatStyle !== undefined ? options.formatStyle : "thousand";
 
-        this.delimiter = options.delimiter !== undefined ? options.delimiter : ",";
+        this.decimalMark = ".";
+
+        this.delimiter = ",";
 
         this.decimalScale = options.decimalScale !== undefined ? options.decimalScale : Infinity;
 
@@ -33,19 +33,20 @@ export default class LiveNumberFormat {
         this.handleKeydown = this.handleKeydown.bind(this);
 
         this.backspacePressed = false;
+        this.isChangeFromUndoRedo = false;
 
         this.init();
 
-        if (this.input.value) {
+        if (this.el.value) {
             // Initial formatting, with cursor at the end
             this.handleInput();
-            this.setCursorPosition(this.input.value.length);
+            this.setCursorPosition(this.el.value.length);
         }
     }
 
     init () {
-        this.input.addEventListener("input", this.handleInput);
-        this.input.addEventListener("keydown", this.handleKeydown);
+        this.el.addEventListener("input", this.handleInput);
+        this.el.addEventListener("keydown", this.handleKeydown);
     }
 
     format (value) {
@@ -117,25 +118,18 @@ export default class LiveNumberFormat {
         // Debounce the stack update for undo and redo
         clearTimeout(this.debounceTimer);
 
-        let oldVal = this.input.value, cursorPosition = this.input.selectionEnd, newVal;
+        let oldVal = this.el.value, cursorPosition = this.el.selectionEnd, newVal;
 
         // if input has only delimiters and 0, do nothing
         // e.g. 0,000,000,000 or ,000,000,000
         if (!this.stripLeadingZeroes) {
             if (oldVal.match(new RegExp(`^[${this.delimiter}0]*$`))) {
+                this.isChangeFromUndoRedo = false;
                 return;
             }
         }
 
-        newVal = this.format(this.input.value); // format value
-
-        // push the value & cursor position to undo stack
-        this.debounceTimer = setTimeout(() => {
-            this.pushToUndoStack({
-                "val": newVal,
-                "cpos": cursorPosition
-            });
-        }, this.debounceTime);
+        newVal = this.format(this.el.value); // format value
 
         // get the new cursor position
         const newPosition = this.getNextCursorPosition(
@@ -144,14 +138,26 @@ export default class LiveNumberFormat {
             newVal,
         );
 
-        this.input.value = newVal;
+        this.el.value = newVal;
 
         this.setCursorPosition(newPosition);
+
+        // Push to stack only if the change is not from undo or redo
+        if (!this.isChangeFromUndoRedo) {
+            this.debounceTimer = setTimeout(() => {
+                this.pushToUndoStack({
+                    "val": newVal,
+                    "cpos": newPosition
+                });
+            }, this.debounceTime);
+        }
+
+        this.isChangeFromUndoRedo = false;
     }
 
     setCursorPosition (pos) {
         pos = pos < 0 ? 0 : pos;
-        this.input.setSelectionRange(pos, pos);
+        this.el.setSelectionRange(pos, pos);
     }
 
     getNextCursorPosition (prevPos, oldValue, newValue) {
@@ -218,12 +224,12 @@ export default class LiveNumberFormat {
         if (oldRawValue.includes("-")) {
             return -1;
         }
-        
+
         // Invalid characters entered, keep cursor at the same position
         if (oldRawValue.match(/[^0-9\.-]/)) {
             return -1;
         }
-        
+
         // keep cursor at the same position
         if (this.stripLeadingZeroes && oldRawValue === '0') {
             return -1;
@@ -258,32 +264,32 @@ export default class LiveNumberFormat {
             return;
         } else if (e.key === "Delete") {
             // if cursor is before delimiter and is NOT at index 0, move cursor 1 place right
-            if (this.input.value[this.input.selectionStart] === this.delimiter && this.input.selectionStart != 0) {
+            if (this.el.value[this.el.selectionStart] === this.delimiter && this.el.selectionStart != 0) {
                 e.preventDefault();
-                this.setCursorPosition(this.input.selectionStart + 1);
+                this.setCursorPosition(this.el.selectionStart + 1);
             }
             return;
         }
 
-        // prevent typing another decimal mark
-        if (this.allowDecimalReplacement === false && this.input.value.includes(this.decimalMark)) {
-            if (e.key === this.decimalMark) {
+        // prevent typing another decimal mark or if the decimal scale is 0
+        if (e.key === this.decimalMark) {
+            if ((this.allowDecimalReplacement === false && this.el.value.includes(this.decimalMark))  || this.decimalScale === 0) {
                 e.preventDefault();
             }
         }
 
         // For no range cursor selection, check if input is greater than the scales.
-        if (this.input.selectionStart === this.input.selectionEnd) {
+        if (this.el.selectionStart === this.el.selectionEnd) {
 
             // restrict input to integer and decimal scales
             if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(e.key)) {
 
                 // Find the cursor position if on left or right of decimal mark
-                let parts = this.getParts(this.input.value, true);
-                let delimeterCount = this.input.value.split(this.delimiter).length - 1;
+                let parts = this.getParts(this.el.value, true);
+                let delimeterCount = this.el.value.split(this.delimiter).length - 1;
 
                 // subtract delimeter count from cursor position to get the correct position of cursor
-                let cursorPositionFromStart = this.input.selectionStart - delimeterCount;
+                let cursorPositionFromStart = this.el.selectionStart - delimeterCount;
 
                 // cursor is on left of decimal mark
                 if (cursorPositionFromStart <= parts.partInteger.length) {
@@ -303,27 +309,27 @@ export default class LiveNumberFormat {
     }
 
     // handleLeftArrow moves cursor 2 places if previous character is delimiter
-    handleLeftArrow (event) {
-        const cursorPositionFromStart = this.input.selectionStart;
+    handleLeftArrow (e) {
+        const cursorPositionFromStart = this.el.selectionStart;
 
         // if previous character is delimiter, move cursor 2 places
         if (cursorPositionFromStart - 2 < 0) {
             return;
         }
 
-        if (this.input.value[cursorPositionFromStart - 2] === this.delimiter) {
-            event.preventDefault();
+        if (this.el.value[cursorPositionFromStart - 2] === this.delimiter) {
+            e.preventDefault();
             this.setCursorPosition(cursorPositionFromStart - 2);
         }
     }
 
     // handleRightArrow moves cursor 2 places if next character is delimiter
-    handleRightArrow (event) {
-        const cursorPositionFromStart = this.input.selectionStart;
+    handleRightArrow (e) {
+        const cursorPositionFromStart = this.el.selectionStart;
 
         // if next character is delimiter, move cursor 2 places
-        if (this.input.value[cursorPositionFromStart] === this.delimiter) {
-            event.preventDefault();
+        if (this.el.value[cursorPositionFromStart] === this.delimiter) {
+            e.preventDefault();
             this.setCursorPosition(cursorPositionFromStart + 2);
         }
     }
@@ -336,41 +342,39 @@ export default class LiveNumberFormat {
     }
 
     // performUndo does an undo operation, sets new value & adjusts cursor position
-    performUndo (e) {
-        e.preventDefault();
+    performUndo () {
+        this.isChangeFromUndoRedo = true;
         if (this.undoStack.length > 1) {
             let currentState = this.undoStack.pop();
             this.redoStack.push(currentState);
 
             let itemToSet = this.undoStack[this.undoStack.length - 1];
-            this.input.value = itemToSet.val;
+            this.el.value = itemToSet.val;
             this.setCursorPosition(itemToSet.cpos);
         } else if (this.undoStack.length === 1) {
             this.redoStack.push(this.undoStack.pop());
-            this.input.value = "";
+            this.el.value = "";
         }
     }
 
     // performRedo does a redo operation, sets new value & adjusts cursor position
-    performRedo (e) {
-        e.preventDefault();
+    performRedo () {
+        this.isChangeFromUndoRedo = true;
         if (this.redoStack.length > 0) {
             let itemToRedo = this.redoStack.pop();
-
             this.undoStack.push(itemToRedo);
-            this.input.value = itemToRedo.val;
+            this.el.value = itemToRedo.val;
             this.setCursorPosition(itemToRedo.cpos);
-
         }
     }
 
     destroy () {
-        this.input.removeEventListener("input", this.handleInput);
-        this.input.removeEventListener("keydown", this.handleKeydown);
+        this.el.removeEventListener("input", this.handleInput);
+        this.el.removeEventListener("keydown", this.handleKeydown);
     }
 
     getRawValue () {
-        return this.input.value;
+        return this.el.value;
     }
 
     getFloatValue () {
