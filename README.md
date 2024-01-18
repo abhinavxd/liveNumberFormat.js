@@ -18,6 +18,10 @@ npm i live-number-format
 
 Default values for config shown below.
 
+```HTML
+<input type="text"/>
+```
+
 ```javascript
 let input = document.querySelector("input");
 new LiveNumberFormat(input,
