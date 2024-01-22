@@ -36,11 +36,11 @@ new LiveNumberFormat(input,
 
         allowNegative: true,
 
-        // Max integers allowed.
+        // Max integer digits allowed.
         // defaults to Infinity
         integerScale: 20,
 
-        // Max decimals allowed.
+        // Max decimals digits allowed.
         // defaults to Infinity
         decimalScale: 7
 });

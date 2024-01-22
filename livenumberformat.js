@@ -49,6 +49,8 @@ export default class LiveNumberFormat {
         this.el.addEventListener("keydown", this.handleKeydown);
     }
 
+    // The following function of code is sourced from `cleave-zen`
+    // Licensed under the MIT License. See LICENSE in the project root for license information.
     format (value) {
         let parts, partSign, partInteger, partDecimal = '';
 
