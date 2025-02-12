@@ -45,3 +45,6 @@ new LiveNumberFormat(input,
         decimalScale: 7
 });
 ```
+
+## Attribution  
+Regex forked from [cleave-zen](https://github.com/nosir/cleave-zen) with improved cursor positioning with fixes and smaller bundle size.
