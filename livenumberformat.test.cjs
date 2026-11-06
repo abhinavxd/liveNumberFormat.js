@@ -274,6 +274,10 @@ test.describe("demo accessibility", () => {
         await page.keyboard.press("Enter");
         await expect(page.locator("#result")).toHaveText("Number accepted: 1,234.50.");
         await expect(page.locator("#result")).toHaveAttribute("aria-live", "polite");
+        await input.fill("-");
+        await expect(page.getByRole("alert")).toBeEmpty();
+        await expect(input).not.toHaveAttribute("aria-invalid", "true");
+        await expect(page.locator("#result")).toBeEmpty();
     });
 
     test("reflows at 320 pixels with enlarged and spaced text", async ({ page }) => {

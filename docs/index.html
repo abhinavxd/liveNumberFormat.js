@@ -120,7 +120,7 @@
         integerScale: "This number exceeds the integer limit. Use at most 20 digits before the decimal point.",
         decimalScale: "This number exceeds the decimal limit. Use at most 7 digits after the decimal point.",
       };
-      let submitted = false;
+      let showErrors = false;
 
       function validate() {
         const code = input.value.trim() === "" ? "required" : formatter.getValidationError();
@@ -137,9 +137,10 @@
 
       document.getElementById("numberForm").addEventListener("submit", event => {
         event.preventDefault();
-        submitted = true;
         resultText.data = "";
-        if (validate()) {
+        const valid = validate();
+        showErrors = !valid;
+        if (valid) {
           resultText.data = `Number accepted: ${formatter.getFormattedValue()}.`;
         } else {
           input.focus();
@@ -148,12 +149,12 @@
 
       input.addEventListener("input", event => {
         resultText.data = "";
-        if (submitted && !event.isComposing) {
+        if (showErrors && !event.isComposing) {
           validate();
         }
       });
       input.addEventListener("compositionend", () => {
-        if (submitted) {
+        if (showErrors) {
           validate();
         }
       });

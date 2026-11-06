@@ -98,7 +98,7 @@ Host pages must provide a visible label, instructions, focus styling, and access
 
 The browser suite covers native editing, undo and redo, bulk text insertion, composition, form reset, teardown, and both source and minified builds. Demo checks cover axe findings, keyboard focus, validation, accessibility tree values, text enlargement, narrow layouts, and forced colors where emulation is supported.
 
-Orca 50.3 speech output was checked with Chromium on Linux. The demo announced the field label, instructions, validation errors, and success message. Typing did not repeatedly announce the changing preview.
+Orca 50.3 speech output was checked with Chromium and Firefox on Linux, including native keyboard input and tab navigation. The demo announced field labels, instructions, validation errors, and success messages. Typing did not repeatedly announce the changing preview. Native clipboard paste, cut, and undo were also checked in Chromium.
 
 ```sh
 npm ci
