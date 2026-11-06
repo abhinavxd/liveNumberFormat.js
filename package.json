@@ -1,13 +1,14 @@
 {
   "name": "live-number-format",
   "version": "0.1.9",
-  "description": "A tiny Javascript library that gives live as-you-type formatting to numbers & currencies, ~1600 bytes minified + gzipped.",
+  "description": "Live number formatting with a separate preview and native text editing.",
   "main": "livenumberformat.js",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node build.cjs",
+    "test": "npm run build && playwright test"
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,13 @@
   "bugs": {
     "url": "https://github.com/abhinavxd/liveNumberFormat.js/issues"
   },
-  "homepage": "https://github.com/abhinavxd/liveNumberFormat.js#readme"
+  "homepage": "https://github.com/abhinavxd/liveNumberFormat.js#readme",
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.0",
+    "terser": "^5.51.2"
+  },
+  "files": [
+    "livenumberformat.js"
+  ]
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>liveNumberFormat.js</title>
     <meta charset="utf-8" />
@@ -7,164 +7,162 @@
     <style>
       * {
         box-sizing: border-box;
-        -webkit-appearance: none;
       }
-      html,
+      html {
+        font-family: "Inter", "Helvetica Neue", "Museo Sans", sans-serif;
+        font-size: 20px;
+        line-height: 1.5;
+        color: #555;
+        background: #fff;
+      }
       body {
-        font-family: "Inter", "Helvetica Neue", "Museo Sans", sans-serif;
-        font-size: 25px;
-        line-height: 30px;
-        color: #555555;
+        margin: 1rem;
       }
-      #numberInput {
-        font-family: "Inter", "Helvetica Neue", "Museo Sans", sans-serif;
-        padding: 15px;
-        font-size: 2rem;
-        line-height: 1.5rem;
-        border: 1px solid #ccc;
-        box-shadow: 2px 2px 0px #ccc;
-        width: 90%;
-        height: 100px;
+      main {
+        margin: 10vh auto 2rem;
+        max-width: 1000px;
+        overflow-wrap: anywhere;
       }
-
-      .eg {
-        font-size: 0.8rem;
-      }
-
-      .note {
-        font-size: 0.6rem;
-        color: #999;
-      }
-
-      a {
-        color: #999;
-      }
-
-      h1 {
+      h1, a {
         color: #0054c6;
       }
-
-      .text-center {
-        text-align: center !important;
+      label {
+        display: block;
+        margin-top: 1rem;
+        font-weight: 600;
       }
-
-      .container {
-        margin: 20vh auto 0 auto;
-        max-width: 1000px;
+      input, select, button {
+        padding: 0.5rem;
+        border: 1px solid #767676;
+        border-radius: 0;
+        background: #fff;
+        color: #333;
+        font: inherit;
+        min-height: 44px;
+        max-width: 100%;
       }
-
-      input,
-      select,
-      #format {
-        outline: none;
-        padding: 8px;
-        border: 1px solid #ccc;
-        box-shadow: 2px 2px 0px #ccc;
-        background-color: white;
-        outline: none;
+      input, select {
+        width: 100%;
       }
-
-      .mt-20 {
-        margin-top: 20px;
+      #numberInput {
+        font-size: 1.5rem;
       }
-
-      @media screen and (max-width: 900px) {
-        body {
-          font-size: 18px;
-          line-height: 22px;
-        }
-        .container {
-          margin-top: 5vh;
-        }
-        #numberInput {
-          font-size: 1.2rem;
-          padding: 10px;
-          line-height: 1.3rem;
-          width: 90%;
-          height: 90px;
+      button {
+        margin-top: 1rem;
+        cursor: pointer;
+      }
+      :focus-visible {
+        outline: 3px solid #0054c6;
+        outline-offset: 3px;
+      }
+      .note {
+        font-size: 0.8rem;
+      }
+      #numberError {
+        color: #a40000;
+      }
+      #numberError:empty {
+        margin: 0;
+      }
+      @media (forced-colors: active) {
+        :focus-visible {
+          outline-color: Highlight;
         }
       }
     </style>
   </head>
   <body>
-    <div class="container">
+    <main>
       <h1>liveNumberFormat.js</h1>
-      <p>
-        A tiny Javascript library that gives live as-you-type formatting to
-        numbers & currencies, ~1600 bytes minified + gzipped.
-      </p>
-      <input
-        autofocus
-        type="text"
-        id="numberInput"
-        placeholder="Enter a number"
-      />
+      <p>Format numbers as you type, with a separate preview that preserves native text editing.</p>
+      <form id="numberForm" novalidate>
+        <label for="numberInput">Number</label>
+        <p id="numberHelp" class="note">
+          Use a period for decimals. Negative numbers are allowed, with up to 20 integer digits and 7 decimal digits.
+          Formatting appears below. Your input stays unchanged.
+        </p>
+        <input type="text" id="numberInput" name="number" aria-describedby="numberHelp" required />
+        <p id="numberError" role="alert"></p>
+        <p id="formattedNumber"></p>
 
-      <select name="format" id="format" class="mt-20">
-        <option value="thousand" selected>Thousand (Western)</option>
-        <option value="thousandLakhCrore">
-          Thousand, lakh, crore (Indian)
-        </option>
-        <option value="tenThousand">Ten thousand (East Asian)</option>
-      </select>
+        <label for="format">Number format</label>
+        <select name="format" id="format">
+          <option value="thousand" selected>Thousand (Western)</option>
+          <option value="thousandLakhCrore">Thousand, lakh, crore (Indian)</option>
+          <option value="tenThousand">Ten thousand (East Asian)</option>
+        </select>
 
-      <br />
-      <p class="eg">Raw: <span id="raw"></span></p>
-
-      <p class="eg">Float: <span id="flt">0</span></p>
-
-      <br />
-      <br />
-      <br />
-
+        <button type="submit">Check number</button>
+        <p id="result" aria-live="polite" aria-atomic="true"></p>
+      </form>
       <p class="note">
-        For features & configurations, see:
-        <a href="https://github.com/abhinavxd/liveNumberFormat.js"
-          >abhinavxd/liveNumberFormat.js</a
-        >
+        Source and configuration:
+        <a href="https://github.com/abhinavxd/liveNumberFormat.js">abhinavxd/liveNumberFormat.js</a>
       </p>
-    </div>
-
+    </main>
     <script type="module">
-      import LiveNumberFormat from "./livenumberformat.min.js";
+      import LiveNumberFormat from "./livenumberformat.min.js?build=5102f39a004e";
 
-      let input = document.querySelector("input");
-
-      // Set up the formatter
-      let formatter = new LiveNumberFormat(input, {
-        formatStyle: document.getElementById("format").value,
-        stripLeadingZeroes: false,
-        allowNegative: true,
-        debounceTime: 200,
+      const input = document.getElementById("numberInput");
+      const error = document.getElementById("numberError");
+      const result = document.getElementById("result");
+      const errorText = error.appendChild(document.createTextNode(""));
+      const resultText = result.appendChild(document.createTextNode(""));
+      const formatter = new LiveNumberFormat(input, {
+        output: document.getElementById("formattedNumber"),
         integerScale: 20,
         decimalScale: 7,
-        allowDecimalReplacement: false,
+      });
+      const errors = {
+        required: "A number is required before it can be checked. Enter a number.",
+        invalidNumber: "This value cannot be read as a number. Use digits and a period for decimals.",
+        negativeNotAllowed: "Negative numbers cannot be accepted. Enter zero or a positive number.",
+        integerScale: "This number exceeds the integer limit. Use at most 20 digits before the decimal point.",
+        decimalScale: "This number exceeds the decimal limit. Use at most 7 digits after the decimal point.",
+      };
+      let showErrors = false;
+
+      function validate() {
+        const code = input.value.trim() === "" ? "required" : formatter.getValidationError();
+        errorText.data = code === null ? "" : errors[code];
+        input.setAttribute("aria-invalid", String(code !== null));
+        const descriptions = input.getAttribute("aria-describedby").split(/\s+/)
+          .filter(id => id !== error.id);
+        if (code !== null) {
+          descriptions.push(error.id);
+        }
+        input.setAttribute("aria-describedby", descriptions.join(" "));
+        return code === null;
+      }
+
+      document.getElementById("numberForm").addEventListener("submit", event => {
+        event.preventDefault();
+        resultText.data = "";
+        const valid = validate();
+        showErrors = !valid;
+        if (valid) {
+          resultText.data = `Number accepted: ${formatter.getFormattedValue()}.`;
+        } else {
+          input.focus();
+        }
       });
 
-      // Set the format style
-      document
-        .getElementById("format")
-        .addEventListener("change", function (e) {
-          formatter.destroy();
-          formatter = new LiveNumberFormat(input, {
-            formatStyle: e.target.value,
-            stripLeadingZeroes: false,
-            allowNegative: true,
-            debounceTime: 200,
-            integerScale: 20,
-            decimalScale: 7,
-            allowDecimalReplacement: false,
-          });
-          input.value = "";
-          input.focus();
-        });
-
-      document
-        .getElementById("numberInput")
-        .addEventListener("input", function (e) {
-          document.getElementById("raw").innerText = formatter.getRawValue();
-          document.getElementById("flt").innerText = formatter.getFloatValue();
-        });
+      input.addEventListener("input", event => {
+        resultText.data = "";
+        if (showErrors && !event.isComposing) {
+          validate();
+        }
+      });
+      input.addEventListener("compositionend", () => {
+        if (showErrors) {
+          validate();
+        }
+      });
+      document.getElementById("format").addEventListener("change", event => {
+        formatter.formatStyle = event.target.value;
+        formatter.refresh();
+        resultText.data = "";
+      });
     </script>
   </body>
 </html>
